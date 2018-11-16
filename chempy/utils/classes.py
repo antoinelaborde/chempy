@@ -32,6 +32,8 @@ class Div():
             self.d = np.expand_dims(self.d, 1)
             
         # Manage i field
+        if isinstance(i, str):
+            i = np.array([i])
         i_field = list(i)
         if len(i) == 0:
             print('i field is empty, numerical row names have been added to div.')
@@ -44,6 +46,8 @@ class Div():
         self.i = np.array(i_val).astype('str')
 
         # Manage v field
+        if isinstance(v, str):
+            v = np.array([v])
         v_field = list(v)
         if len(v) == 0:
             print('v field is empty, numerical col names have been added to div.')
