@@ -4,31 +4,86 @@
 @author: DOMI & ALA
 """
 
+import chempy.utils.util as util
+import chempy.utils.classes as classes
+
+
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 
+from collections import OrderedDict
 
-def curve(div,indices): 
+
+def curve(div, i=None, cmap='hsv', legend_label=None, legend=True): 
     """
     Plots one or several row as curves 
-    Tests if the variables names can be interpreted as values for the x axis)
         
     Parameters
     ----------
-    div: div file  
-    indices: indices of the row to be plotted (list of integer or a single integer)   
-    """
+    div: div or list of div(mandatory)
+
+    i: list (optional, default=None)
+        name of the rows to select or indexes of row to select in a list
+
+    Notes
+    -----
+
+    if div is a list of div, each div in the list is plot with a different color
     
-    try :
-        floats=[float(x) for x in div.v]
-    except ValueError:
-        floats=range(0,len(div.v))
-    if isinstance(indices,int):
-        plt.plot(floats,div.d[indices,:])        
-            #pl.title(div.i[indices])   
+    """
+    mpl.style.use('seaborn')
+    # Check if div is a list of div or a div
+    if isinstance(div, list):
+        for ind, div_ in enumerate(div):
+            if isinstance(div_, classes.Div):
+                raise ValueError('Element ' + str(ind) + ' of your list is not a Div')
+        curve_type = 'list'
+    elif not(isinstance(div, classes.Div)):
+        raise ValueError('div must be a div instance or a list of div instances')
     else:
-        for row in indices:
-                plt.plot(floats,div.d[row,:])
-    plt.show()
+        curve_type = 'one'
+    
+    # Select rows of div
+    if i is not None:
+        if isinstance(div, list):
+            print('i index is ignored when div is a list')
+        else:
+            div = util.selectrow(div, i)
+
+
+    # Check if div.v can be interpreted as numericals
+    x_vector = util.vfield2num(div)
+    if x_vector is None:
+        x_vector = np.arange(div.v.shape[0])
+
+    # one div case
+    if curve_type == 'one':
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.plot(x_vector, div.d.T)
+        plt.show()
+    # list of div case
+    elif curve_type == 'list':
+        cmap_vec = mpl.cm.get_cmap(cmap)
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ind = 0
+        for div_group, filtername in zip(group_obj.div_list, group_obj.filter_list):
+            ind += 1
+            ax.plot(x_vector, div_group.d.T,label=filtername, c=cmap_vec(ind/len(group_obj.div_list)))
+        # Handle legend
+        if legend and legend_label is None:
+            handles, labels = ax.get_legend_handles_labels()
+            by_label = OrderedDict(zip(labels, handles))
+            leg = plt.legend(by_label.values(), by_label.keys(), title='Legend')
+            leg.draggable()
+        if legend and legend_label is not None:
+            if len(legend_label) != ind:
+                raise ValueError('legend_label must contains ' + str(ind) + 'elements')
+
+            leg = plt.legend(legend_label, title='Legend')
+            leg.draggable()
+        plt.show()
 
 
 def map(div,col1,col2,margin=0.1,group='',fontsize=20):

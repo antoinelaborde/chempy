@@ -72,15 +72,15 @@ class Pca(classes.Foo):
         if self.centred:
             mean_x = np.mean(X, axis=0, keepdims=True)
             X = X - mean_x
-            self.mean_div = util.Div(d=mean_x, i='mean', v=div.v)
+            self.mean_div = util.Div(d=mean_x, i='mean', v=div.v, id='mean')
         else:
-            self.mean_div = util.Div(d=np.zeros((1,p)), i='mean', v=div.v)
+            self.mean_div = util.Div(d=np.zeros((1,p)), i='mean', v=div.v, id='mean')
         if self.normed:
             std_x = np.std(X, axis=0, keepdims=True)
             X = X / std_x
-            self.std_div = util.Div(d=std_x, i='standard deviation', v=div.v)
+            self.std_div = util.Div(d=std_x, i='standard deviation', v=div.v, id='std')
         else:
-            self.std_div = util.Div(d=np.ones((1,p)), i='standard deviation', v=div.v)
+            self.std_div = util.Div(d=np.ones((1,p)), i='standard deviation', v=div.v, id='std')
         # PCA if N>P
         if n > p:
             T_T = np.dot(X.T, X)/n
@@ -112,11 +112,11 @@ class Pca(classes.Foo):
         variance_explained = np.round(eigenvalues/sum(eigenvalues)*100, 2)
         axisname = ['A' + str(i+1) + ' ' + str(variance_explained[i]) + '%' for i in range(variance_explained.shape[0])]
 
-        self.scores_div = util.Div(d=scores, i=div.i, v=axisname)
-        self.eigenvec_div = util.Div(d=eigenvectors, i=div.v, v=axisname)
-        self.loading_div = util.Div(d=eigenvectors/np.sqrt(n), i=div.v, v=axisname)
-        self.eigenval_div = util.Div(d=eigenvalues, i=axisname, v='Eigenvalue')
-        self.varscores_div = util.Div(d=variable_scores, i=div.v, v=axisname)
+        self.scores_div = util.Div(d=scores, i=div.i, v=axisname, id='scores')
+        self.eigenvec_div = util.Div(d=eigenvectors, i=div.v, v=axisname, id='eigenvectors')
+        self.loading_div = util.Div(d=eigenvectors/np.sqrt(n), i=div.v, v=axisname, id='loadings')
+        self.eigenval_div = util.Div(d=eigenvalues, i=axisname, v='Eigenvalue', id='eigenvalues')
+        self.varscores_div = util.Div(d=variable_scores, i=div.v, v=axisname, id='variables scores')
         self.variance_explained = variance_explained
     
     def apply(self, div):
