@@ -28,3 +28,6 @@ cp.curve(grouping_obj.div_list, legend_label=grouping_obj.filter_list)
 # Select y column for color curve figure
 Ycolor = cp.selectcol(Y, [18])
 cp.curve(X, ycolor = Ycolor, cmap='Greens')
+
+
+# je rajoute du code pour rien dire
