@@ -33,13 +33,14 @@ class Div():
             
         # Manage i field
         if isinstance(i, str):
-            i = np.array([i])
-        i_field = list(i)
-        if len(i) == 0:
+            i_field = [i]
+        else:
+            i_field = list(i)
+        if len(i_field) == 0:
             print('i field is empty, numerical row names have been added to div.')
             i_val = list(range(self.d.shape[0]))
-        elif len(i) != self.d.shape[0]:
-            print('Warning! the i field you provide has incorrect number of elements (i has ' + str(len(i)) + ' and should have ' + str(self.d.shape[0]) + '). Numerical row names have been added to div. ')
+        elif len(i_field) != self.d.shape[0]:
+            print('Warning (' + id + ')! the i field you provide has incorrect number of elements (i has ' + str(len(i_field)) + ' and should have ' + str(self.d.shape[0]) + '). Numerical row names have been added to div. ')
             i_val = list(range(self.d.shape[0]))
         else:
             i_val = i_field
@@ -47,13 +48,14 @@ class Div():
 
         # Manage v field
         if isinstance(v, str):
-            v = np.array([v])
-        v_field = list(v)
-        if len(v) == 0:
+            v_field = [v]
+        else:
+            v_field = list(v)
+        if len(v_field) == 0:
             print('v field is empty, numerical col names have been added to div.')
             v_val = list(range(self.d.shape[1]))
-        elif len(v) != self.d.shape[1]:
-            print('Warning! the v field you provide has incorrect number of elements (v has ' + str(len(v)) + ' and should have ' + str(self.d.shape[1]) + '). Numerical col names have been added to div. ')
+        elif len(v_field) != self.d.shape[1]:
+            print('Warning (' + str(id) + ')! the v field you provide has incorrect number of elements (v has ' + str(len(v_field)) + ' and should have ' + str(self.d.shape[1]) + '). Numerical col names have been added to div. ')
             v_val = list(range(self.d.shape[1]))
         else:
             v_val = v_field

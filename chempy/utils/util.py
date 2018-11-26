@@ -828,6 +828,27 @@ def check_duplicate(div):
 
     return out_obj
 
+def vfield2num(div):
+    """
+    vfield2num tests if div.v can be interpreted as numericals
+    Parameters
+    ----------
+    div: an instance of Div class
+    
+    return
+    ------
+    None if vfield cannot be interpreted as numericals
+    numpy array if vfield can be interpreted as numericals
+
+    """
+    vfield = div.v
+    try:
+        vfield = vfield.astype('float')
+    except ValueError:
+        vfield = None
+    return vfield
+
+
 def save_workspace(local_out):
     """
     Save all variables in the ipython workspace

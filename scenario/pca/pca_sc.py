@@ -29,3 +29,5 @@ pca_obj = cp.pca(X1)
 
 # Apply PCA on X2
 scores_div = cp.compute_score(X2, pca_obj)
+
+

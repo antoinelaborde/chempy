@@ -7,6 +7,8 @@
 # Import all sub-packages
 __all__ = ['analysis','plot','process','utils']
 
+import matplotlib as mpl
+mpl.use('Qt5Agg')
 
 # Import all subpackage
 from . import analysis
