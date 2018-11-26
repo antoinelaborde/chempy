@@ -12,9 +12,9 @@ import numpy as np
 
 # Let's import some data
 # First, import spectral data
-X = cp.read2div('./scenario/pca/X_pca_sc.CSV')
+X = cp.read2div('./data_set/X1.CSV')
 # Then, import Y values
-Y = cp.read2div('./scenario/pca/Y_pca_sc.CSV')
+Y = cp.read2div('./data_set/Y1.CSV')
 
 
 # Cut X in two parts
