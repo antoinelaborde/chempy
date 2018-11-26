@@ -4,8 +4,8 @@
 Script for utils
 """
 
-%load_ext autoreload
-%autoreload 2
+#%load_ext autoreload
+#%autoreload 2
 # Import chempy and numpy packages
 import chempy as cp
 import numpy as np
@@ -14,9 +14,9 @@ import numpy as np
 
 # Let's import some data
 # First, import spectral data
-X = cp.read2div('./scenario/utils/X_util_sc.CSV')
+X = cp.read2div('./data_set/X1.CSV')
 # Then, import Y values
-Y = cp.read2div('./scenario/utils/Y_util_sc.CSV')
+Y = cp.read2div('./data_set/Y1.CSV')
 
 
 # You can check the field of the data using field function
@@ -179,7 +179,3 @@ out = cp.check_duplicate(X_dup)
 # duplicate_d gives you information about duplicates in the d field
 # out.duplicate_d --> {'col': [[4, 292], [30, 293]], 'row': [[200, 501], [100, 500]]}
 # This information tells you that colunms 4 and 292 in d are identical as well as columns 30 and 293. It also tells you that rows 200 and 501 are identical as well as rows 100 and 500.
-
-
-
-

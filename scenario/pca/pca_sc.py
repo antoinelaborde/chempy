@@ -4,17 +4,17 @@
 Script for principal component analysis
 """
 
-%load_ext autoreload
-%autoreload 2
+#%load_ext autoreload
+#%autoreload 2
 # Import chempy and numpy packages
 import chempy as cp
 import numpy as np
 
 # Let's import some data
 # First, import spectral data
-X = cp.read2div('./scenario/pca/X_pca_sc.CSV')
+X = cp.read2div('./data_set/X1.CSV')
 # Then, import Y values
-Y = cp.read2div('./scenario/pca/Y_pca_sc.CSV')
+Y = cp.read2div('./data_set/Y1.CSV')
 
 
 # Cut X in two parts
@@ -29,5 +29,5 @@ pca_obj = cp.pca(X1)
 
 # Apply PCA on X2
 scores_div = cp.compute_score(X2, pca_obj)
-
-
+# Have a look to the first three PCA loadings
+cp.curve(cp.transpose(pca_obj.eigenvec_div),row=[0,1,2])

@@ -42,6 +42,6 @@ from .model.ridge_regression import ridge_regression
 
 
 from .model.apply import apply_model
-from .plot.figure import curve
+from .plot.figure import curve, map2
 
 from .process.preprocessing import process
