@@ -4,8 +4,8 @@
 Script for principal component analysis
 """
 
-%load_ext autoreload
-%autoreload 2
+#%load_ext autoreload
+#%autoreload 2
 # Import chempy and numpy packages
 import chempy as cp
 import numpy as np
@@ -29,5 +29,5 @@ pca_obj = cp.pca(X1)
 
 # Apply PCA on X2
 scores_div = cp.compute_score(X2, pca_obj)
-
-
+# Have a look to the first three PCA loadings
+cp.curve(cp.transpose(pca_obj.eigenvec_div),row=[0,1,2])

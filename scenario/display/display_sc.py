@@ -4,8 +4,8 @@
 Script for display functions
 """
 
-%load_ext autoreload
-%autoreload 2
+# %load_ext autoreload
+# %autoreload 2
 # Import chempy and numpy packages
 import chempy as cp
 import numpy as np
@@ -19,7 +19,7 @@ Y = cp.read2div('./data_set/Y1.CSV')
 # Use curve quickly to display X data
 cp.curve(X)
 # Only display some indexes of X
-cp.curve(X, i=[1,2])
+cp.curve(X, row=[1,2])
 # Use grouping to get list of div and display them with different colors
 grouping_obj = cp.grouping(X, [1,2])
 # Display curve with different colors and specify the filters expression as legend label
@@ -30,4 +30,14 @@ Ycolor = cp.selectcol(Y, [18])
 cp.curve(X, ycolor = Ycolor, cmap='Greens')
 
 
-# je rajoute du code pour rien dire
+# Let's test a PCA
+pca_obj = cp.pca(X)
+# Maps the scores : X axis is the first score, Y axis is the second score
+cp.map2(pca_obj.scores_div,0 ,1)
+# Only display indexes from 10 to 99
+cp.map2(pca_obj.scores_div,0,1,row=list(range(10,100)))
+# Add a colormap with respect to Y div
+cp.map2(pca_obj.scores_div,0,1,ycolor=Ycolor, cmap='Greens')
+# Use grouping
+grouping_obj = cp.grouping(pca_obj.scores_div, [1,2])
+cp.map2(grouping_obj.div_list,0,1,legend_label=grouping_obj.filter_list, cmap='Set1')
