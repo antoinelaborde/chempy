@@ -15,6 +15,7 @@ import numpy as np
 # Let's import some data
 # First, import spectral data
 X = cp.read2div('./data_set/X1.CSV')
+
 # Then, import Y values
 Y = cp.read2div('./data_set/Y1.CSV')
 
@@ -50,13 +51,13 @@ Ydelete = cp.deleterow(Y, [12,49])
 
 
 # Append some columns
-XY = cp.appendcol(X, Y)
+XY = cp.appendcol([X, Y])
 # Be careful to non authorized column append, check the error for the line below
-cp.appendcol(Xselect, Y)
+cp.appendcol([Xselect, Y])
 
 # Append some rows
 Xselect_bis = cp.selectrow(X, ['381p27','go2p15'])
-X_appendrow = cp.appendrow(Xselect, Xselect_bis)
+X_appendrow = cp.appendrow([Xselect, Xselect_bis])
 
 
 
@@ -154,14 +155,14 @@ Xmin_ = cp.min_div(X)
 X_row1 = cp.selectrow(X, [100])
 X_row2 = cp.selectrow(X, [200])
 
-X_dup = cp.appendrow(X, X_row1)
-X_dup = cp.appendrow(X_dup, X_row2)
+X_dup = cp.appendrow([X, X_row1])
+X_dup = cp.appendrow([X_dup, X_row2])
 
 X_col1 = cp.selectcol(X_dup, [4])
 X_col2 = cp.selectcol(X_dup, [30])
 
-X_dup = cp.appendcol(X_dup, X_col1)
-X_dup = cp.appendcol(X_dup, X_col2)
+X_dup = cp.appendcol([X_dup, X_col1])
+X_dup = cp.appendcol([X_dup, X_col2])
 
 # Use the check_duplicate function on X_dup
 out = cp.check_duplicate(X_dup)

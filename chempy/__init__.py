@@ -35,6 +35,7 @@ from .utils.util import field, selectcol, selectrow, deletecol, deleterow, appen
 
 # cp.pca, cp.compute_score
 from .analysis.pca import pca
+from .analysis.fda import fda
 from .analysis.factorial import compute_score
 
 from .model.pls_regression import pls_regression

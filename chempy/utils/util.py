@@ -257,19 +257,20 @@ def selectrow(div, row_filter):
     
     return filt_div
 
-def appendcol(*div):
+def appendcol(div_list):
     """
     add columns of Div instances
     Parameters
     ----------
-    div: div instance
+    div: list
+        list of div instances
     Return
     ------
     div instance
 
     """
     # Check compatibility
-    for ind, div_ in enumerate(div):
+    for ind, div_ in enumerate(div_list):
         if ind == 0:
             ref_n = div_.d.shape[0]
             ref_i = div_.i
@@ -281,7 +282,7 @@ def appendcol(*div):
             if not(np.array_equal(test_i, ref_i)):
                 print('Warning: div#' + str(ind) + '.i is different from the reference div.i')
 
-    for ind, div_ in enumerate(div):
+    for ind, div_ in enumerate(div_list):
         if ind == 0:
             cumul_div = copy(div_)
         else:
@@ -292,19 +293,20 @@ def appendcol(*div):
     
     return cumul_div
     
-def appendrow(*div):
+def appendrow(div_list):
     """
     add rows of Div instances
     Parameters
     ----------
-    div: div instance
+    div: list
+        list of div instances
     Return
     ------
     div instance
 
     """
     # Check compatibility
-    for ind, div_ in enumerate(div):
+    for ind, div_ in enumerate(div_list):
         if ind == 0:
             ref_p = div_.d.shape[1]
             ref_v = div_.v
@@ -316,7 +318,7 @@ def appendrow(*div):
             if not(np.array_equal(test_v, ref_v)):
                 print('Warning: div#' + str(ind) + '.v is different from the reference div.v')
 
-    for ind, div_ in enumerate(div):
+    for ind, div_ in enumerate(div_list):
         if ind == 0:
             cumul_div = copy(div_)
         else:
@@ -912,3 +914,41 @@ def load_workspace(filename, globalres):
         var_dict = f['datastore']
 
     globalres.update(var_dict)
+
+
+def binary_classif_matrix(group):
+    """
+    Create a matrix that describes to what class belongs each row of the group vector
+    Parameters
+    ----------
+    group: div instance
+        div discribing the group belongings
+
+    Returns
+    ----------
+    group_mat: div instance
+        for each row, is one for the corresponding class   
+    """
+
+    # Group must be a div with one dimension
+    if 1 not in group.d.shape:
+        raise ValueError('group must be a div with dimensions n x 1')
+    
+    if group.d.shape[1] != 1:
+        group_val = group.d.T
+    else:
+        group_val = group.d
+
+    # Number of groups
+    unique_group = np.unique(group_val)
+    n_group = unique_group.shape[0]
+    n_row = group_val.shape[0]
+    # Init classif matrix
+    classif_matrix = np.zeros((n_row,n_group))
+
+    for i in np.arange(n_row):
+        group_index = np.ravel(np.where((unique_group == group_val[i])))
+        classif_matrix[i,group_index] = 1
+
+    classif_div = Div(d=classif_matrix, i=group.i, v=unique_group)
+    return classif_div
