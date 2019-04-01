@@ -32,13 +32,12 @@ from .utils.import_  import read2div, saisir2div, fileread
 from .utils.import_ import read2div
 from .utils.util import field, selectcol, selectrow, deletecol, deleterow, appendcol, appendrow, savediv, grouping, copy, transpose, col_index, row_index, min_div, max_div, mean_div, sum_div, check_duplicate
 
-
 # cp.pca, cp.compute_score
 from .analysis.pca import pca
 from .analysis.fda import fda
 from .analysis.factorial import compute_score
 
-from .model.pls_regression import pls_regression
+from .model.pls_regression import pls
 from .model.ridge_regression import ridge_regression
 
 

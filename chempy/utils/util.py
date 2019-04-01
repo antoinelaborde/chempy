@@ -88,6 +88,8 @@ def deletecol(div, col_filter):
     filt_div: div instance with only filtered columns
 
     """
+    if isinstance(col_filter, (str,int)):
+        col_filter = [col_filter]
     if not(isinstance(col_filter, list)):
         raise ValueError('col_filter must be a list')
 
@@ -133,6 +135,8 @@ def deleterow(div, row_filter):
     filt_div: div instance with only filtered rows
 
     """
+    if isinstance(row_filter, (str,int)):
+        row_filter = [row_filter]
     if not(isinstance(row_filter, list)):
         raise ValueError('row_filter must be a list')
 
@@ -179,8 +183,11 @@ def selectcol(div, col_filter):
     filt_div: div instance with only filtered columns
 
     """
+    if isinstance(col_filter, (str,int)):
+        col_filter = [col_filter]
     if not(isinstance(col_filter, list)):
         raise ValueError('col_filter must be a list')
+    
 
     # Check the type of filter: col names or col indexes
     if all([isinstance(filt, str) for filt in col_filter]):
@@ -224,6 +231,8 @@ def selectrow(div, row_filter):
     filt_div: div instance with only filtered rows
 
     """
+    if isinstance(row_filter, (str,int)):
+        row_filter = [row_filter]
     if not(isinstance(row_filter, list)):
         raise ValueError('row_filter must be a list')
     
@@ -952,3 +961,36 @@ def binary_classif_matrix(group):
 
     classif_div = Div(d=classif_matrix, i=group.i, v=unique_group)
     return classif_div
+
+
+def quantif_perf(y, yh, nb_variables=None):
+    """
+    calculate performance indicators for regression results
+    Parameters
+    ----------
+    y: div structure (mandatory)
+        div reference values
+    yh: div structure (mandatory)
+        div predicted values
+    nb_variables: int (optional, default=None)
+        number of variables used
+    """
+    
+    # RMSE
+    rmse = np.sqrt(np.sum(np.square(y - yh)))
+    # R2
+    ssres = np.sum((yh - y)**2)
+    sstot = np.sum((y - np.mean(y))**2)
+    R2 = 1 - ssres/sstot
+
+    out = {'rmse':rmse, 'r2':R2}
+    if nb_variables is not None:
+        n = y.shape[0]
+        # BIC
+        BIC = n*np.log(ssres/n) + nb_variables*np.log(n)
+        # AIC
+        AIC = n*np.log(ssres/n) + 2*nb_variables
+        out['AIC'] = AIC
+        out['BIC'] = BIC
+    
+    return out
