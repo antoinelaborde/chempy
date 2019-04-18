@@ -7,11 +7,10 @@
 import chempy.utils.util as util
 #import chempy.utils.classes as classes
 import numpy as np
-from classes import Div, Foo
+from chempy.utils.classes import Div, Foo
 import matplotlib as mpl
 mpl.use('Qt5Agg')
 import matplotlib.pyplot as plt
-import figure as fig
 from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
 
 from collections import OrderedDict

@@ -13,8 +13,7 @@ import shelve
 import datetime
 import matplotlib.pyplot as pl
 from copy import deepcopy
-from classes import Div, Foo
-import util as u
+from .classes import Div, Foo
 
 """
 def field(test):
