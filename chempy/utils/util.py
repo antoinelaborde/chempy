@@ -37,6 +37,8 @@ def max_div(div, field = ''):
 def mean_div(div, field = ''):
 def sum_div(div, field = ''):
 def check_duplicate(div):
+def isdiv(obj):
+def randomize(div)
 """
 
 def field(obj):
