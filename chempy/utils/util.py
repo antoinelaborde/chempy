@@ -89,8 +89,6 @@ def deletecol(div, col_filter):
     filt_div: div instance with only filtered columns
 
     """
-    if isinstance(col_filter, (str,int)):
-        col_filter = [col_filter]
     if not(isinstance(col_filter, list)):
         raise ValueError('col_filter must be a list')
 
@@ -136,8 +134,6 @@ def deleterow(div, row_filter):
     filt_div: div instance with only filtered rows
 
     """
-    if isinstance(row_filter, (str,int)):
-        row_filter = [row_filter]
     if not(isinstance(row_filter, list)):
         raise ValueError('row_filter must be a list')
 
@@ -184,8 +180,6 @@ def selectcol(div, col_filter):
     filt_div: div instance with only filtered columns
 
     """
-    if isinstance(col_filter, (str,int)):
-        col_filter = [col_filter]
     if not(isinstance(col_filter, list)):
         raise ValueError('col_filter must be a list')
 
@@ -231,8 +225,6 @@ def selectrow(div, row_filter):
     filt_div: div instance with only filtered rows
 
     """
-    if isinstance(row_filter, (str,int)):
-        row_filter = [row_filter]
     if not(isinstance(row_filter, list)):
         raise ValueError('row_filter must be a list')
     
