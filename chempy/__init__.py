@@ -30,7 +30,7 @@ from .utils.import_  import read2div, saisir2div, fileread
 
 
 from .utils.import_ import read2div
-from .utils.util import field, selectcol, selectrow, deletecol, deleterow, appendcol, appendrow, savediv, grouping, copy, transpose, col_index, row_index, min_div, max_div, mean_div, sum_div, check_duplicate
+from .utils.util import field, selectcol, selectrow, deletecol, deleterow, appendcol, appendrow, savediv, grouping, copy, transpose, col_index, row_index, min_div, max_div, mean_div, sum_div, check_duplicate, new_function
 
 # cp.pca, cp.compute_score
 from .analysis.pca import pca

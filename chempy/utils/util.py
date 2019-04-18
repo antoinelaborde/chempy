@@ -13,7 +13,8 @@ import shelve
 import datetime
 import matplotlib.pyplot as pl
 from copy import deepcopy
-from .classes import Div, Foo
+from classes import Div, Foo
+import util as u
 
 """
 def field(test):
@@ -187,7 +188,6 @@ def selectcol(div, col_filter):
         col_filter = [col_filter]
     if not(isinstance(col_filter, list)):
         raise ValueError('col_filter must be a list')
-    
 
     # Check the type of filter: col names or col indexes
     if all([isinstance(filt, str) for filt in col_filter]):
@@ -487,7 +487,7 @@ def transpose(div):
 
 def row_index(div, row):
     """
-    row_index returns the row indexes corresponding for which row == div.i
+    row_index returns the row index corresponding for which row == div.i
     Parameters
     ----------
     div: an instance of Div class   
@@ -500,7 +500,7 @@ def row_index(div, row):
     
 def col_index(div, col):
     """
-    col_index returns the col indexes corresponding for which col == div.v
+    col_index returns the col index corresponding for which col == div.v
     Parameters
     ----------
     div: an instance of Div class   
@@ -712,6 +712,33 @@ def mean_div(div, field = ''):
 
     return div_mean
 
+def group_mean(div,group):
+    """
+    Compute the means according to a grouping
+    Parameters
+    ----------
+    div: data to be averaged by group
+    group: integer giving the group number for each row
+    Return
+    ------
+    center: div of the averages by group
+    group_size: number of observations belonging to the corresponding group
+
+    """
+    maxgroup=int(max(group.d))
+    xcenter=np.zeros((maxgroup,div.d.shape[1]))
+    #np.zeros(3, dtype = int)
+    aux=np.zeros(maxgroup,dtype=int)
+    for i in range(1,maxgroup+1):
+        index_group=np.where(group.d == i)[0]
+        #print(index_group.shape)
+        #print(i,div.d[index_group,:].shape[0])
+        aux[i-1]=np.asarray(div.d[index_group,:].shape)[0]       
+        xcenter[i-1,:]=np.mean(div.d[index_group,:],axis=0)
+    center=Div(d=xcenter,i=np.array(list(range(1,(maxgroup+1)))),v=div.v) 
+    group_size=Div(aux,i=np.array(list(range(1,maxgroup+1))),v='group size')
+    return center,group_size
+    #print(np.sum(aux))    
 def sum_div(div, field = ''):
     """
     Return the sum of d according to the field
@@ -859,7 +886,26 @@ def vfield2num(div):
         vfield = None
     return vfield
 
+def isdiv(obj):
+    """
+    isdiv tests if obj is a div instance
+    Parameters
+    ----------
+    obj: a python objet
+    
+    return
+    -----
+    true if obj has field d, i, v, else otherwise 
 
+    Note
+    ------
+    The function only verifies that fields d, i, v exist in the object. This
+    is sufficient in practice to give confidence that the object is an instance
+    of class Div. This function tries to replace the function isinstance of Python
+    wich is not correctly working in some situation.
+    """
+    return(hasattr(obj, 'd') and hasattr(obj, 'i') and hasattr(obj, 'v'))
+    
 def save_workspace(local_out):
     """
     Save all variables in the ipython workspace
@@ -962,35 +1008,68 @@ def binary_classif_matrix(group):
     classif_div = Div(d=classif_matrix, i=group.i, v=unique_group)
     return classif_div
 
+def randomize(div):
+     """
+     return div with rows in random order
+     Parameters
+     ----------
+     div: an instance of Div class
+     
+     return
+     ------
+     a div matrix with the order of the rows randomized
+     
+     """
+     #print(type(div))
+     if(not(isdiv(div))):
+         raise ValueError('the entered argument is not an instance of class div')
 
-def quantif_perf(y, yh, nb_variables=None):
+     rorder=np.random.permutation(np.arange(div.i.shape[0]))
+     #print(type(rorder))
+     return(selectrow(div,rorder.tolist()))
+
+def reorder(div1,div2):
     """
-    calculate performance indicators for regression results
+    This function makes it possible to realign the rows of div1 and div2, in order
+    to have the identifiers corresponding.
+    The function discards the observations which are not present in d1v and div2.
+    Fails if div1 or div2 contains duplicate (identical) identifiers of rows. 
+    The rows in the resulting out Div instances are sorted in the alphabetic order of 
+    the rows identifiers (.i)
+    
     Parameters
     ----------
-    y: div structure (mandatory)
-        div reference values
-    yh: div structure (mandatory)
-        div predicted values
-    nb_variables: int (optional, default=None)
-        number of variables used
-    """
-    
-    # RMSE
-    rmse = np.sqrt(np.sum(np.square(y - yh)))
-    # R2
-    ssres = np.sum((yh - y)**2)
-    sstot = np.sum((y - np.mean(y))**2)
-    R2 = 1 - ssres/sstot
+    div1, div2 instances of class Div to be reordered
 
-    out = {'rmse':rmse, 'r2':R2}
-    if nb_variables is not None:
-        n = y.shape[0]
-        # BIC
-        BIC = n*np.log(ssres/n) + nb_variables*np.log(n)
-        # AIC
-        AIC = n*np.log(ssres/n) + 2*nb_variables
-        out['AIC'] = AIC
-        out['BIC'] = BIC
+    Returns
+    ----------
+    out1, out2 : reordered Div instances corresponding to div1 and div2 respectively
+    diff1, diff2 : list of rows names with no correspondance found in div1 and div2 repsectively 
+    """
+    if(not(isdiv(div1))):
+         raise ValueError('the entered first argument is not an instance of class div')
+    if(not(isdiv(div2))):
+         raise ValueError('the entered second argument is not an instance of class div')
+    if((np.shape(div1.i)[0])!= (np.shape(np.unique(div1.i))[0])):
+        raise ValueError('the first argument has not unique row identifiers. Impossible to reororder')
+    #np.intersect1d(X.i, rX.i
+    if((np.shape(div2.i)[0])!= (np.shape(np.unique(div2.i))[0])):
+        raise ValueError('the second argument has not unique row identifiers. Impossible to reororder')
+    common=np.intersect1d(div1.i,div2.i)
+    list1=list()
+    list2=list()
+#    data2=np.array()
+    for index, thisname in enumerate(common):
+        row_index1 = np.where(div1.i == thisname)[0]#.ravel().tolist()
+        list1.append(row_index1[0])
+        row_index2 = np.where(div2.i == thisname)[0]#.ravel().tolist()
+        list2.append(row_index2[0])
+#    print(list1)
+    out1=selectrow(div1,list1)
+    out2=selectrow(div2,list2)
+#    diff1=list(set(common).difference(set(div1.i))) 
+#    diff2=list(set(common).difference(set(div2.i))) 
+    diff1=list(set(div1.i).difference(set(common))) 
+    diff2=list(set(div2.i).difference(set(common))) 
     
-    return out
+    return(out1,out2,diff1,diff2)

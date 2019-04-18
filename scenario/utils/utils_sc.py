@@ -4,8 +4,8 @@
 Script for utils
 """
 
-#%load_ext autoreload
-#%autoreload 2
+%load_ext autoreload
+%autoreload 2
 # Import chempy and numpy packages
 import chempy as cp
 import numpy as np

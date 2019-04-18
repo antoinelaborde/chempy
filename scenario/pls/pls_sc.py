@@ -49,6 +49,7 @@ cp.curve(pred.perf, row=[0],legend_label=pred.perf.v[0])
 
 # Apply PLS on test set
 pred_test = pls_single.predict(X2, Y2s)
+
 # Look at training performance (RMSE)
 cp.curve(pred_test.perf, row=[0],legend_label=pred_test.perf.v[0])
 # ?????????? PROBLEM HERE, look at the perf !! Le predict marche sans true Y ! Il y a un souci dans le code, pour ridge aussi du coup

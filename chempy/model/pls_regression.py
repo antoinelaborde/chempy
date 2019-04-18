@@ -16,7 +16,7 @@ def pls():
 
 """
 
-def pls(x_div, y_div, max_dim):
+def pls(x_div, y_div, max_dim, algo='PLS2'):
     """
     performs partial least square regression of x_div on y_div 
     Parameters
@@ -27,7 +27,8 @@ def pls(x_div, y_div, max_dim):
         div reference values
     max_dim: int (mandatory)
         maximum numer of latent variable to use
-
+    algo: str (optional, default="PLS2")
+        name of the algorithm to use PLS1 OR PLS2
 
     Returns
     -------
@@ -41,19 +42,18 @@ def pls(x_div, y_div, max_dim):
 
     if x_div.d.shape[0] != y_div.d.shape[0]:
         raise ValueError('x_div and y_div must have the same number of rows')
+    if algo not in ['PLS1','PLS2']:
+        raise ValueError(str(algo) + 'is an unkown algorithm name for PLS. Choose PLS1 or PLS2')
 
     pls_obj = Pls()
     pls_obj.fit(x_div, y_div, max_dim)
     pred = pls_obj.predict(x_div, y_div)
-
-
     return pls_obj, pred
-
 
 
 class Pls(classes.Foo):
 
-    def fit(self, x_div, y_div, max_dim):
+    def fit(self, x_div, y_div, max_dim, algo='PLS2'):
         """
         performs partial least square regression of x_div on y_div 
         Parameters
@@ -64,6 +64,8 @@ class Pls(classes.Foo):
             div reference values
         max_dim: int (mandatory)
             maximum numer of latent variable to use
+        algo: str (optional, default='PLS2')
+            name of the algo to use PLS1 or PLS2
         """
         self.x_div = util.copy(x_div)
         self.y_div = util.copy(y_div)
@@ -71,6 +73,9 @@ class Pls(classes.Foo):
         X = self.x_div.d
         Y = self.y_div.d.astype(float)
 
+        if Y.d.shape[1] != 1 and algo == 'PLS1':
+            # Warning here !
+            raise ValueError('PLS1 can only be used with one dimensional Y vector. Algo is switch to PLS2')
         Beta, Beta0, T, P, Q, W = pls2(X, Y, max_dim)
 
         # beta_list contains one div structure for each y value to predict

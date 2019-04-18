@@ -5,14 +5,14 @@
 """
 
 import chempy.utils.util as util
-import chempy.utils.classes as classes
-
+#import chempy.utils.classes as classes
 import numpy as np
-
+from classes import Div, Foo
 import matplotlib as mpl
 mpl.use('Qt5Agg')
 import matplotlib.pyplot as plt
-
+import figure as fig
+from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
 
 from collections import OrderedDict
 
@@ -47,14 +47,16 @@ def curve(div, row=None, cmap='hsv', legend_label=None, legend=True, ycolor=None
     if div is a list of div, each div in the list is plot with a different color
     
     """
+    print('figure curve from chempy\chempy\plot')
     mpl.style.use('seaborn')
     # Check if div is a list of div or a div
     if isinstance(div, list):
         for ind, div_ in enumerate(div):
             if not(isinstance(div_, classes.Div)):
                 raise ValueError('Element ' + str(ind) + ' of your list is not a Div')
-        curve_type = 'list'
+        curve_type = 'list'    
     elif not(isinstance(div, classes.Div)):
+                
         raise ValueError('div must be a div instance or a list of div instances')
     else:
         curve_type = 'one'
@@ -301,3 +303,79 @@ def get_cmap(y, cmap):
         colors[yval] = scalarmap.to_rgba(yval)
     scalarmap.set_array([])
     return colors, scalarmap
+
+def show_vector(div,row,xfontsize=10):
+   """
+   Represents a row of a matrix as a succession identifiers
+   Parameters
+   -----------
+   div : div matrix
+   row(integer) : the row to be represented
+   xfontsize(optional): size of the font (default 10)
+...The identifiers of the columns are plotted with X being the index of the variable and Y the actual
+...value of the variable for the selected row "nrow"
+...
+...Main  use : examining the output of "anavar1" and "anovan1" functions on
+   discrete variables
+   """
+#   N =5
+#   params = pl.gcf()
+#   plSize = params.get_size_inches()
+#   params.set_size_inches( (plSize[0]*N, plSize[1]*N) )
+   margin=0.1
+   if(not(isdiv(div))):
+         raise ValueError('the entered first argument is not an instance of class div')
+   thisrow=selectrow(div,[row]);
+   lenx=thisrow.d.size;
+   #print(thisrow.d[0,5])
+   xmin=0
+   xmax=thisrow.d.size
+   deltax=(xmax-xmin)*margin    
+   ymin=np.min(thisrow.d)
+   ymax=np.max(thisrow.d)
+   deltay=(ymax-ymin)*margin
+   plt.axis([xmin-deltax,xmax+deltax,ymin-deltay,ymax+deltay])
+   for i in range(0,lenx):
+      plt.text(i,thisrow.d[0,i],thisrow.v[i],fontsize=xfontsize)
+   
+   plt.title(thisrow.i[0])   
+   plt.xlabel('Rank of the variables')
+   plt.ylabel('Intensity')
+   plt.show()
+   
+def dendro(div,cut=30):
+    """
+    dendro					- dendrogram using euclidian metric and Ward linkage
+    parameters
+    ----------
+    div : a div matrix
+    cut : level of cutting the dendrogram (default :30)
+    
+    returns
+    -------
+    dendro_obj with fields
+        info_obj  :'dendrogram'
+        group     : identifier of the group of each observtion
+        center    :barycenter of each group
+        group size: number of observations in each group 
+    The function displays a dendrogram possibly cut at a given level
+    and gives the values od the obtained clustersmy
+    """
+    X1=div.d
+    Z=linkage(X1, 'ward')
+    plt.figure(figsize=(25, 10))
+    plt.title('Hierarchical Clustering Dendrogram')
+    plt.xlabel('sample index')
+    plt.ylabel('distance')
+    R=dendrogram(Z,leaf_rotation=90.,leaf_font_size=12.,labels=div.i,truncate_mode='lastp',p=cut,
+               show_leaf_counts=False,show_contracted=False)
+    plt.show()
+    T = fcluster(Z, cut, 'maxclust')
+    #print(T.size)
+#    clustername=str(range(1,(cut-1))
+    Tx=Div(T,div.i,'group')
+    center,group_size=util.group_mean(div,Tx)
+    info_obj = util.Foo('dendrogram') 
+    dendro_obj = util.Foo(info_obj=info_obj, group=Tx, center=center, group_size=group_size)
+
+    return dendro_obj
