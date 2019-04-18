@@ -9,6 +9,6 @@ __all__ = ['pca','ridge_regression','apply']
 
 
 #from .pls import pls
-from .pls_regression import pls_regression
+from .pls_regression import pls
 from .ridge_regression import ridge_regression
 from .apply import apply_model
