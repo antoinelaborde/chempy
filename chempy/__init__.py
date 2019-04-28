@@ -45,3 +45,5 @@ from .model.apply import apply_model
 from .plot.figure import curve, map2
 
 from .process.preprocessing import process
+
+from .stats.stats import kruswal, anavar1, cormap, covmap, distance
