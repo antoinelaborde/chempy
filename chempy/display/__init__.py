@@ -7,4 +7,4 @@
 # Import all sub-packages
 __all__ = ['figure']
 
-from .figure import curve
+from .display import curve, map2, map, show_vector, dendro, 

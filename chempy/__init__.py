@@ -36,6 +36,7 @@ from .utils.util import field, selectcol, selectrow, deletecol, deleterow, appen
 from .analysis.pca import pca
 from .analysis.fda import fda
 from .analysis.factorial import compute_score
+from .analysis.analysis import kruswal, anavar1, cormap, covmap, distance
 
 from .model.pls_regression import pls
 from .model.ridge_regression import ridge_regression
@@ -45,5 +46,3 @@ from .model.apply import apply_model
 from .plot.figure import curve, map2
 
 from .process.preprocessing import process
-
-from .stats.stats import kruswal, anavar1, cormap, covmap, distance

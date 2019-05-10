@@ -13,3 +13,5 @@ __all__ = ['pca','fda']
 from .pca import pca
 from .fda import fda
 from .factorial import compute_score
+
+from .analysis import kruswal, anavar1, cormap, covmap, distance
