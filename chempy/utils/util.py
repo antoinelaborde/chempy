@@ -38,6 +38,9 @@ def sum_div(div, field = ''):
 def check_duplicate(div):
 def isdiv(obj):
 def randomize(div)
+reorder
+quantif_perf
+
 """
 
 def field(obj):
@@ -730,7 +733,8 @@ def group_mean(div,group):
     center=Div(d=xcenter,i=np.array(list(range(1,(maxgroup+1)))),v=div.v) 
     group_size=Div(aux,i=np.array(list(range(1,maxgroup+1))),v='group size')
     return center,group_size
-    #print(np.sum(aux))    
+    #print(np.sum(aux))   
+ 
 def sum_div(div, field = ''):
     """
     Return the sum of d according to the field
@@ -1039,9 +1043,9 @@ def reorder(div1,div2):
     diff1, diff2 : list of rows names with no correspondance found in div1 and div2 repsectively 
     """
     if(not(isdiv(div1))):
-         raise ValueError('the entered first argument is not an instance of class div')
+            raise ValueError('the entered first argument is not an instance of class div')
     if(not(isdiv(div2))):
-         raise ValueError('the entered second argument is not an instance of class div')
+            raise ValueError('the entered second argument is not an instance of class div')
     if((np.shape(div1.i)[0])!= (np.shape(np.unique(div1.i))[0])):
         raise ValueError('the first argument has not unique row identifiers. Impossible to reororder')
     #np.intersect1d(X.i, rX.i
@@ -1050,18 +1054,190 @@ def reorder(div1,div2):
     common=np.intersect1d(div1.i,div2.i)
     list1=list()
     list2=list()
-#    data2=np.array()
     for index, thisname in enumerate(common):
         row_index1 = np.where(div1.i == thisname)[0]#.ravel().tolist()
         list1.append(row_index1[0])
         row_index2 = np.where(div2.i == thisname)[0]#.ravel().tolist()
         list2.append(row_index2[0])
-#    print(list1)
     out1=selectrow(div1,list1)
     out2=selectrow(div2,list2)
-#    diff1=list(set(common).difference(set(div1.i))) 
-#    diff2=list(set(common).difference(set(div2.i))) 
     diff1=list(set(div1.i).difference(set(common))) 
     diff2=list(set(div2.i).difference(set(common))) 
     
     return(out1,out2,diff1,diff2)
+
+def quantif_perf(y, yh, nb_variables=None):
+    """
+    calculate performance indicators for regression results
+    Parameters
+    ----------
+    y: div structure (mandatory)
+        div reference values
+    yh: div structure (mandatory)
+        div predicted values
+    nb_variables: int (optional, default=None)
+        number of variables used
+    """
+
+    # RMSE
+    rmse = np.sqrt(np.sum(np.square(y - yh)))
+    # R2
+    ssres = np.sum((yh - y)**2)
+    sstot = np.sum((y - np.mean(y))**2)
+    R2 = 1 - ssres/sstot
+
+    out = {'rmse':rmse, 'r2':R2}
+    if nb_variables is not None:
+        n = y.shape[0]
+        # BIC
+        BIC = n*np.log(ssres/n) + nb_variables*np.log(n)
+        # AIC
+        AIC = n*np.log(ssres/n) + 2*nb_variables
+        out['AIC'] = AIC
+        out['BIC'] = BIC
+
+    return out
+
+def cormap(div1,div2):
+    """
+    calculate the correlation between two Div instances
+    Parameters
+    ----------
+    div1, div2: Div instances dimensioned n * p1 and n * p2 respectively
+    These instances must have the same number of rows
+    Return
+    ------
+    cor_div: div instance with matrix of correlation dimensioned p1 * p2
+    Example
+    -------
+    cor_div = cormap(div1,div2)
+    """
+    
+    # Check line compatibility
+    ref_n = div1.d.shape[0]
+    ref_i = div1.i
+    test_n = div2.d.shape[0]
+    test_i = div2.i
+    if test_n != ref_n:
+        raise ValueError('div#' + str(2) + ' does not have the good number of rows. div#' + str(2) + ' has ' + str(test_n) + ' rows but the reference div has ' + str(ref_n) + ' rows')
+    if not(np.array_equal(test_i, ref_i)):
+        print('Warning: div#' + str(2) + '.i is different from the reference div.i')
+    
+# meancenter calculation for div 1
+    mean_vec1 = np.mean(div1.d, axis=0)
+    mmx1 = div1.d - mean_vec1
+
+# meancenter calculation for div 2
+    mean_vec2 = np.mean(div2.d, axis=0)
+    mmx2 = div2.d - mean_vec2
+    
+# standardize preprocessing for div1
+    xstd1 = np.std(div1.d,axis=0)
+    stx1 = mmx1 / xstd1  
+    
+# standardize preprocessing for div2
+    xstd2 = np.std(mmx2,axis=0)
+    stx2 = mmx2 / xstd2  
+
+# correlation matrix calculation
+    tstx1 = stx1.T
+    cor = (1/ref_n)*((tstx1).dot(stx2))
+    
+    cor_div = copy(div1)
+    cor_div.d = cor
+    cor_div.i = div1.v
+    cor_div.v = div2.v
+    cor_div.id = ' matrix correlation'
+    
+    return cor_div
+
+def covmap(div1,div2):
+    """
+    calculate the covariance between two Div instances
+    Parameters
+    ----------
+    div1, div2: Div instances dimensioned n * p1 and n * p2 respectively
+    These instances must have the same number of rows
+    Return
+    ------
+    cov_div: div instance with matrix of covariance dimensioned p1 * p2
+    Example
+    -------
+    cov_div = covmap(div1,div2)
+    """
+    
+    # Check line compatibility
+    ref_n = div1.d.shape[0]
+    ref_i = div1.i
+    test_n = div2.d.shape[0]
+    test_i = div2.i
+    if test_n != ref_n:
+        raise ValueError('div#' + str(2) + ' does not have the good number of rows. div#' + str(2) + ' has ' + str(test_n) + ' rows but the reference div has ' + str(ref_n) + ' rows')
+    if not(np.array_equal(test_i, ref_i)):
+        print('Warning: div#' + str(2) + '.i is different from the reference div.i')
+
+    # meancenter calculation for div 1
+    mean_vec1 = np.mean(div1.d, axis=0)
+    mmx1 = div1.d - mean_vec1
+
+    # meancenter calculation for div 2
+    mean_vec2 = np.mean(div2.d, axis=0)
+    mmx2 = div2.d - mean_vec2
+
+    # covariance matrix calculation
+    tmmx1 = mmx1.T
+    cov = (1/ref_n)*((tmmx1).dot(mmx2))
+
+    cov_div = copy(div1)
+    cov_div.d = cov
+    cov_div.i = div1.v
+    cov_div.v = div2.v
+    cov_div.id = ' matrix covariance'
+
+    return cov_div
+    
+def distance(div1,div2):
+    """
+    calculate the Usual Euclidian distances between two Div instances
+    Parameters
+    ----------
+    div1, div2: Div instances dimensioned n1 * p and n2 * p respectively
+    These instances must have the same number of columns
+    Return
+    ------
+    D: matrix n1 x n2 of Euclidian distances between the observations
+    Example
+    -------
+    D = distance(X1,X2);
+    """
+    
+    # Check column compatibility
+    ref_n = div1.d.shape[1]
+    ref_v = div1.v
+    test_n = div2.d.shape[1]
+    test_v = div2.v
+    if test_n != ref_n:
+        raise ValueError('div#' + str(2) + ' does not have the good number of columns. div#' + str(2) + ' has ' + str(test_n) + ' columns but the reference div has ' + str(ref_n) + ' columns')
+    if not(np.array_equal(test_v, ref_v)):
+        print('Warning: div#' + str(2) + '.v is different from the reference div.v')
+    
+    nrow1,ncol1 = div1.d.shape[:]
+    nrow2,ncol2 = div2.d.shape[:]
+    
+    aux = np.ones((nrow1,1))
+    
+    Distance = copy(div1)
+    Distance.d = np.zeros((nrow1,nrow2))
+    
+    for i2 in range(0,nrow2):
+        if i2 % 100 == 0:
+            print(i2," among ", nrow2)
+        delta = (div1.d - aux @ div2.d[i2:i2+1,:]).T
+        delta = delta * delta;
+        Distance.d[:,i2] = np.sqrt(sum(delta,0))
+
+    Distance.i = div1.i
+    Distance.v = div2.i
+    Distance.id = 'matrices distance'
+    
+    return Distance

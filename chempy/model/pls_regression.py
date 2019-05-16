@@ -10,7 +10,7 @@ import chempy.utils.util as util
 import chempy.utils.classes as classes
 
 import scipy
-
+from copy import deepcopy
 """
 def pls():
 
@@ -50,7 +50,6 @@ def pls(x_div, y_div, max_dim, algo='PLS2'):
     pred = pls_obj.predict(x_div, y_div)
     return pls_obj, pred
 
-
 class Pls(classes.Foo):
 
     def fit(self, x_div, y_div, max_dim, algo='PLS2'):
@@ -72,28 +71,30 @@ class Pls(classes.Foo):
 
         X = self.x_div.d
         Y = self.y_div.d.astype(float)
-
-        if Y.d.shape[1] != 1 and algo == 'PLS1':
-            # Warning here !
-            raise ValueError('PLS1 can only be used with one dimensional Y vector. Algo is switch to PLS2')
-        Beta, Beta0, T, P, Q, W = pls2(X, Y, max_dim)
+        Beta, Beta0, T, P, Q, W, vip = pls2(X, Y, max_dim)
 
         # beta_list contains one div structure for each y value to predict
         beta_list = []
         beta0_list = []
+        vip_list = []
         for i in range(Beta.shape[1]):
             beta = util.Div(d=Beta[:,i,:], v=x_div.v,id='beta ' + self.y_div.v[i], i=[str(i) + ' latent variables' for i in range(1,max_dim+1)])
 
             beta0 = util.Div(d=np.expand_dims(Beta0[i,:],axis=1), v=['Beta0'],id='beta 0 ' + self.y_div.v[i], i=[str(i) + ' latent variables' for i in range(1,max_dim+1)])
 
+            vip_div = util.Div(d=vip[:,i], i=x_div.v, id=self.y_div.v[i], v=['Variable Important in Projection'])
+
             beta_list.append(beta)
             beta0_list.append(beta0)
+            vip_list.append(vip_div)
         if len(beta_list) == 1:
             self.beta = beta_list[0]
             self.beta0 = beta0_list[0]
+            self.vip = vip_list[0]
         else:
             self.beta = beta_list
             self.beta0 = beta0_list
+            self.vip = vip_list
         
 
         self.W = util.Div(d=W.T, v=x_div.v,id='W', i=['pls ' + str(i) for i in range(1,max_dim+1)])
@@ -184,36 +185,39 @@ def pls2(X, Y, maxdim):
     -------
 
     """
-    n, p = X.shape
+    X_ = deepcopy(X)
+    Y_ = deepcopy(Y)
+
+    n, p_ = X.shape
     _, q = Y.shape
     n_component = maxdim
     component_range = np.arange(maxdim)
     # Center X and Y
-    mean_x = np.mean(X, axis=0)
-    mean_y = np.mean(Y, axis=0)
+    mean_x = np.mean(X_, axis=0)
+    mean_y = np.mean(Y_, axis=0)
 
-    X -= mean_x
-    Y -= mean_y
+    X_ -= mean_x
+    Y_ -= mean_y
 
     # Initialize matrices
     T = np.zeros((n, n_component))
     U = np.zeros((n, n_component))
-    W = np.zeros((p, n_component))
+    W = np.zeros((p_, n_component))
     C = np.zeros((q, n_component))
-    P = np.zeros((p, n_component))
+    P = np.zeros((p_, n_component))
     Q = np.zeros((q, n_component))
-    Beta = np.zeros((p, q, n_component))
+    Beta = np.zeros((p_, q, n_component))
     Beta0 = np.zeros((q, n_component))
 
-    Xk = X
-    Yk = Y
-    beta = np.zeros((p, q))
+    Xk = X_
+    Yk = Y_
+    beta = np.zeros((p_, q))
+    Rk = np.eye(p_)
     # Loop on components
     for i, k in enumerate(component_range):
         # Weights estimation with SVD
         Usvd, _, Vsvd = scipy.linalg.svd(np.dot(Xk.T,Yk), full_matrices=False)
         w = Usvd[:, 0]
-
         # Ensure output of svd to be deterministic
         w = svd_corr(w)
         # X scores computation
@@ -223,7 +227,6 @@ def pls2(X, Y, maxdim):
         # p are coefficients such that x = p*t
         q = np.dot(Yk.T, t) / np.dot(t.T, t)
         p = np.dot(Xk.T, t) / np.dot(t.T, t)
-        
         t = np.expand_dims(t, axis=1)
         q = np.expand_dims(q, axis=1)
         p = np.expand_dims(p, axis=1)
@@ -231,19 +234,24 @@ def pls2(X, Y, maxdim):
         # Deflation
         Xk -= np.dot(t, p.T)
         Yk -= np.dot(t, q.T)
-
         # Storing
         T[:, k] = t.ravel()
         P[:, k] = p.ravel()
         Q[:, k] = q.ravel()
         W[:, k] = w.ravel()
         # Compute Beta
-        beta += np.dot(w, q.T)
+        beta += np.dot(Rk,np.dot(w, q.T))
         beta0 = mean_y - np.dot(mean_x, beta)
+        # For keeping linear transformation for X
+        Rk = np.dot(Rk, np.eye(p_) - np.dot(w, p.T))
+
         # Store beta
         Beta[:,:,i] = beta
         Beta0[:,i] = beta0
-    return Beta.T, Beta0, T, P, Q, W
+    # VIP calculation
+    vip_ = vip(T, W, Y_)
+
+    return Beta.T, Beta0, T, P, Q, W, vip_
 
 def svd_corr(x):
     """
@@ -266,3 +274,24 @@ def svd_corr(x):
     max_abs_cols = np.argmax(np.abs(x), axis=0)
     x *= np.sign(x[max_abs_cols])
     return x
+
+def vip(T, W, Y):
+    """
+    calculates the Variable Important for Projection
+    Parameters
+    ----------
+    T: div (mandatory)
+        Score of PLS
+    W: div (mandatory)
+        eigenvector of PLS
+    Y: div (mandatory)
+        variables to predict
+    """
+    n = Y.shape[0]
+    W2 = W**2
+    cor = util.cormap(util.Div(d=T), util.Div(d=Y))
+    r2 = cor.d**2
+    sumr2 = np.sum(r2, axis=0)
+    vip_ = np.dot(W2,r2)
+    vip = np.sqrt(n*vip_/sumr2)
+    return vip

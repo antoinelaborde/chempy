@@ -5,7 +5,7 @@
 """
 
 import chempy.utils.util as util
-#import chempy.utils.classes as classes
+import chempy.utils.classes as classes
 import numpy as np
 from chempy.utils.classes import Div, Foo
 import matplotlib as mpl
@@ -55,7 +55,6 @@ def curve(div, row=None, cmap='hsv', legend_label=None, legend=True, ycolor=None
                 raise ValueError('Element ' + str(ind) + ' of your list is not a Div')
         curve_type = 'list'    
     elif not(isinstance(div, classes.Div)):
-                
         raise ValueError('div must be a div instance or a list of div instances')
     else:
         curve_type = 'one'
