@@ -9,7 +9,7 @@ import os
 import csv
 import numpy as np
 from scipy.io import loadmat
-from .classes import Div
+from classes import Div
 
 """
 def read2div(filename, filetype=None)

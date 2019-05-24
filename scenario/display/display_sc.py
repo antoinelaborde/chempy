@@ -7,16 +7,24 @@ Script for display functions
 # %load_ext autoreload
 # %autoreload 2
 # Import chempy and numpy packages
+
 import chempy as cp
 import numpy as np
+import chempy.utils.classes as classes
+#isinstance(X.i,np.ndarray)
+#Out[17]: True
+#
+#isinstance(X.v,np.ndarray)
+#Out[18]: True
 
 # Let's import some data
 # First, import spectral data
-X = cp.read2div('./data_set/X1.CSV')
+X = cp.read2div('X1.CSV')
 # Then, import Y values
-Y = cp.read2div('./data_set/Y1.CSV')
+Y = cp.read2div('Y1.CSV')
 
 # Use curve quickly to display X data
+print(type(X))
 cp.curve(X)
 # Only display some indexes of X
 cp.curve(X, row=[1,2])
