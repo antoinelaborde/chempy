@@ -12,10 +12,10 @@ from scipy.io import loadmat
 from classes import Div
 
 """
-def read2div(filename, filetype=None)
-def saisir2div(filename)
-def fileread(fileName,delimiter=";")
-def gtfileread(filename)
+read2div(filename, filetype=None)
+saisir2div(filename)
+fileread(fileName,delimiter=";")
+gtfileread(filename)
 """
 
 

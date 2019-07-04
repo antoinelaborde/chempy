@@ -9,9 +9,7 @@ import numpy as np
 import chempy.utils.util as util
 
 
-"""
-def ridge_regression(x_div, y_div, T_range, centred=True):
-"""
+
 
 def ridge_regression(x_div, y_div, T_range, centred=True):
     """

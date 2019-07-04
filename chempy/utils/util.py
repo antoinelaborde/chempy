@@ -17,28 +17,29 @@ from classes import Div, Foo
 import util as u
 
 """
-def field(test):
-def copy(div):
-def deletecol(div,filter):
-def deleterow(div,filter): 
-def selectcol(div,filter):
-def selectrow(div,filter):
-def appendcol(*div):
-def appendrow(*div):
-def savediv(div, filename, delimiter=';'): 
-def grouping(div, filter):
-def row_index(div, row):
-def col_index(div, col):
-def transpose(div):
-def row_index(div, row):
-def col_index(div, row):
-def min_div(div, field = ''):
-def max_div(div, field = ''):
-def mean_div(div, field = ''):
-def sum_div(div, field = ''):
-def check_duplicate(div):
-def isdiv(obj):
-def randomize(div)
+field(test):
+copy(div):
+deletecol(div,filter):
+deleterow(div,filter): 
+selectcol(div,filter):
+selectrow(div,filter):
+appendcol(*div):
+appendrow(*div):
+savediv(div, filename, delimiter=';'): 
+grouping(div, filter):
+row_index(div, row):
+col_index(div, col):
+transpose(div):
+row_index(div, row):
+col_index(div, row):
+min_div(div, field = ''):
+max_div(div, field = ''):
+mean_div(div, field = ''):
+sum_div(div, field = ''):
+check_duplicate(div):
+isdiv(obj):
+randomize(div)
+reorder(div1,div2):
 """
 
 def field(obj):
@@ -706,31 +707,37 @@ def mean_div(div, field = ''):
     return div_mean
 
 def group_mean(div,group):
-    """
-    Compute the means according to a grouping
-    Parameters
-    ----------
-    div: data to be averaged by group
-    group: integer giving the group number for each row
-    Return
-    ------
-    center: div of the averages by group
-    group_size: number of observations belonging to the corresponding group
+     """
+     Compute the means according to a grouping
+     Parameters
+     ----------
+     div: data to be averaged by group
+     group: integer giving the group number for each row
+     Return
+     ------
+     Class foo with Div      
+         center: div of the averages by group
+         group_size: number of observations belonging to the corresponding group
 
-    """
-    maxgroup=int(max(group.d))
-    xcenter=np.zeros((maxgroup,div.d.shape[1]))
-    #np.zeros(3, dtype = int)
-    aux=np.zeros(maxgroup,dtype=int)
-    for i in range(1,maxgroup+1):
-        index_group=np.where(group.d == i)[0]
-        #print(index_group.shape)
-        #print(i,div.d[index_group,:].shape[0])
-        aux[i-1]=np.asarray(div.d[index_group,:].shape)[0]       
-        xcenter[i-1,:]=np.mean(div.d[index_group,:],axis=0)
-    center=Div(d=xcenter,i=np.array(list(range(1,(maxgroup+1)))),v=div.v) 
-    group_size=Div(aux,i=np.array(list(range(1,maxgroup+1))),v='group size')
-    return center,group_size
+     """
+     group_index=np.unique(group.d)
+     ngroup=len(group_index)
+     #print(ngroup,div.d.shape[1])
+     xcenter=np.zeros([ngroup,div.d.shape[1]])
+     aux=np.zeros([ngroup,1])
+     k=0
+     for i in group_index:
+         index_group=np.where(group.d == i)[0]
+#         print(index_group.shape)
+#        #print(i,div.d[index_group,:].shape[0])
+         aux[k]=np.asarray(div.d[index_group,:].shape)[0]
+         xcenter[k,:]=np.mean(div.d[index_group,:])
+         k=k+1
+#     print(xcenter)
+     center=Div(d=xcenter,i=np.array(group_index),v=div.v) 
+     group_size=Div(d=aux,i=np.array(group_index),v='group size')
+     Group_mean_type=u.Foo(info='Group_mean',center=center,group_size=group_size) 
+     return Group_mean_type
     #print(np.sum(aux))    
 def sum_div(div, field = ''):
     """

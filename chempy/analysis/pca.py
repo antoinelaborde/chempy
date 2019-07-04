@@ -2,7 +2,7 @@
 """
 Created on Tue Jul 14 10:00:54 2015
 
-@author: DOMI
+@author: DOMI 
 Updated by ALA 2018/10/10
 """
 
@@ -12,7 +12,7 @@ import chempy.utils.classes as classes
 
 
 """
-def pca(div, normed=False, centred=True):
+pca(div, normed=False, centred=True):
 """
 
 def pca(div, normed=False, centred=True):
@@ -119,6 +119,7 @@ class Pca(classes.Foo):
         self.varscores_div = util.Div(d=variable_scores, i=div.v, v=axisname, id='variables scores')
         self.variance_explained = variance_explained
     
+  
     def apply(self, div):
         """
         apply the PCA object on X
@@ -136,3 +137,63 @@ class Pca(classes.Foo):
         scores = np.dot(X, self.loading_div.d)
         scores_div = util.Div(d=scores, i=div.i, v=self.scores_div.v)
         return scores_div
+
+    def stat(self, comp1=1, comp2=2):
+        """
+        Some elementary stats on PC components
+        Input argument :
+        ================
+        comp1 (integer): one component to be analysed
+        comp2 (integer): second component to be analysed
+        
+        Ouput argument:
+        ===============
+        Div objectt with 7 columns   : QTL, 1 CO2, CTR, 2, CO2, CTR
+        QLT: squared cosinus with the plan comp1/comp2 (quality 
+        of the observations)
+        CO2:squared cosinus of the angle between the observation and the axis
+        We have QLT=CO2col1 + CO2col2
+        CTR Contribution of the observation to the component. 
+........From G.Saporta, Probabilités analyse des données et statistiques, 
+        Ed Technip, page 182
+        
+        Typical example:
+        ===============
+        p=cp.pca(DATA);
+        res=p.stat(p,1,2) # stats for components #1 and #2
+        savediv(res,'mystats') #see results with excel
+        """
+        col1=comp1-1
+        col2=comp2-1
+        k=0;
+        score=self.scores_div.d
+        s=np.sum(score*score,axis=1);
+        n,p=score.shape
+        aux=np.zeros([n,3])
+        qlt=np.zeros([n,2])
+        qlt1=np.zeros([n,1])
+        bid1=[]
+        for i in [col1,col2]:
+            aux[:,0]=score[:,i]
+            aux[:,1]=np.true_divide(aux[:,0]*aux[:,0],s)
+            aux[:,2]=aux[:,0]*aux[:,0]
+            aux[:,2]=aux[:,2]/sum(aux[:,2])
+            #print(aux[0,0],aux[0,1], aux[0,2])
+            bid1.append(aux)
+            qlt[:,k]=aux[:,0]*aux[:,0]
+            k=k+1
+
+        qlt1[:,0]=np.true_divide(np.sum(qlt,axis=1),s)
+    #       print(qlt)
+        res=np.hstack((qlt1,bid1[0],bid1[1]))
+        varname=['QLT',str(comp1),'CO2'+ str(comp1),'CTR'+ str(comp1),str(comp2),'CO2'+ str(comp2),'CTR'+ str(comp2)]
+        return(classes.Div(d=res,i=self.scores_div.i,v=varname))
+#
+#res.v=char({'QLT' ; num2str(col1);'CO2';'CTR'; num2str(col2);'CO2';'CTR'});
+
+    
+    
+    
+    
+    
+    

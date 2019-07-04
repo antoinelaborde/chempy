@@ -10,7 +10,7 @@ import chempy.utils.util as util
 
 
 """
-def apply_model(model_obj, x_div, y_div=None):
+apply_model(model_obj, x_div, y_div=None):
 """
 
 def apply_model(model_obj, x_div, y_div=None):

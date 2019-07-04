@@ -21,11 +21,11 @@ import numpy as np
 import chempy.utils.util
 
 """
-def process(div, process_type):
-def savitzky_golay(div, window_size, order, deriv):
-def snv(div):
-def meancenter(div):
-def standardize(div):
+process(div, process_type):
+savitzky_golay(div, window_size, order, deriv):
+snv(div):
+meancenter(div):
+standardize(div):
     
 """
 

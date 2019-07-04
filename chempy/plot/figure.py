@@ -50,8 +50,8 @@ def curve(div, row=None, cmap='hsv', legend_label=None, legend=True, ycolor=None
     mpl.style.use('seaborn')
     # Check if div is a list of div or a div
     
-    print('I am here in chempy\chempy`\plot')
-    print(type(div))
+#    print('I am here in chempy\chempy`\plot')
+#    print(type(div))
     if isinstance(div, list):
         for ind, div in enumerate(div):
             if not(isinstance(div, classes.Div)):

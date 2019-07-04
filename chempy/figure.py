@@ -306,7 +306,7 @@ def get_cmap(y, cmap):
 
 def show_vector(div,row,xfontsize=10):
    """
-   Represents a row of a matrix as a succession identifiers
+   Represents a row of a matrix as a succession of identifiers
    Parameters
    -----------
    div : div matrix
@@ -345,7 +345,7 @@ def show_vector(div,row,xfontsize=10):
    
 def dendro(div,cut=30):
     """
-    dendro					- dendrogram using euclidian metric and Ward linkage
+    Dendrogram using euclidian metric and Ward linkage
     parameters
     ----------
     div : a div matrix
@@ -359,7 +359,7 @@ def dendro(div,cut=30):
         center    :barycenter of each group
         group size: number of observations in each group 
     The function displays a dendrogram possibly cut at a given level
-    and gives the values od the obtained clustersmy
+    and gives the values od the obtained clusters
     """
     X1=div.d
     Z=linkage(X1, 'ward')
