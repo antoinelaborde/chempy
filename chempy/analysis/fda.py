@@ -14,7 +14,7 @@ from sklearn.preprocessing import LabelEncoder
 
 
 """
-def fda(div, group, pca_dim, dim):
+fda(div, group, pca_dim, dim):
 """
 
 def fda(div, group, pca_dim, dim, pca = True):

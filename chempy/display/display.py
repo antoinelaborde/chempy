@@ -50,10 +50,10 @@ def curve(div, row=None, cmap='hsv', legend_label=None, legend=True, ycolor=None
     mpl.style.use('seaborn')
     # Check if div is a list of div or a div
     if isinstance(div, list):
-        for ind, div_ in enumerate(div):
-            if not(isinstance(div_, classes.Div)):
+        for ind, div_ins in enumerate(div):
+            if not(isinstance(div_ins, classes.Div)):
                 raise ValueError('Element ' + str(ind) + ' of your list is not a Div')
-        curve_type = 'list'    
+        curve_type = 'list'
     elif not(isinstance(div, classes.Div)):
         raise ValueError('div must be a div instance or a list of div instances')
     else:

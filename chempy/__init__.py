@@ -15,6 +15,7 @@ from . import analysis
 from . import display
 from . import process
 from . import utils
+from . import stats
 
 # Import Div class
 # Note: Foo is not available from chempy directly

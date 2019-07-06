@@ -16,31 +16,29 @@ from copy import deepcopy
 from .classes import Div, Foo
 
 """
-def field(test):
-def copy(div):
-def deletecol(div,filter):
-def deleterow(div,filter): 
-def selectcol(div,filter):
-def selectrow(div,filter):
-def appendcol(*div):
-def appendrow(*div):
-def savediv(div, filename, delimiter=';'): 
-def grouping(div, filter):
-def row_index(div, row):
-def col_index(div, col):
-def transpose(div):
-def row_index(div, row):
-def col_index(div, row):
-def min_div(div, field = ''):
-def max_div(div, field = ''):
-def mean_div(div, field = ''):
-def sum_div(div, field = ''):
-def check_duplicate(div):
-def isdiv(obj):
-def randomize(div)
-reorder
-quantif_perf
-
+field(test):
+copy(div):
+deletecol(div,filter):
+deleterow(div,filter): 
+selectcol(div,filter):
+selectrow(div,filter):
+appendcol(*div):
+appendrow(*div):
+savediv(div, filename, delimiter=';'): 
+grouping(div, filter):
+row_index(div, row):
+col_index(div, col):
+transpose(div):
+row_index(div, row):
+col_index(div, row):
+min_div(div, field = ''):
+max_div(div, field = ''):
+mean_div(div, field = ''):
+sum_div(div, field = ''):
+check_duplicate(div):
+isdiv(obj):
+randomize(div)
+reorder(div1,div2):
 """
 
 def field(obj):
@@ -86,7 +84,7 @@ def deletecol(div, col_filter):
     Parameters
     ----------
     col_filter: list of str or int
-        name of the column to delete or indexes of column to delete
+        name of the column to delete or index of column to delete
     Returns
     ----------
     filt_div: div instance with only filtered columns
@@ -95,7 +93,7 @@ def deletecol(div, col_filter):
     if not(isinstance(col_filter, list)):
         raise ValueError('col_filter must be a list')
 
-    # Check the type of filter: col names or col indexes
+    # Check the type of filter: col names or col index
     if all([isinstance(filt, str) for filt in col_filter]):
         filter_case = 'str'
     elif all([isinstance(filt, (np.integer, int)) for filt in col_filter]):
@@ -104,23 +102,23 @@ def deletecol(div, col_filter):
         raise ValueError('col_filter argument must contain only str or int, not both.')
 
     if filter_case == 'str':
-        filt_indexes = []
+        filt_index = []
         for filt in col_filter:
             if filt not in div.v:
                 raise ValueError(filt + ' is not in div.v')
             else:
                 index = np.where(div.v == filt)[0].ravel()[0]
-                filt_indexes.append(index)
+                filt_index.append(index)
     elif filter_case == 'index':
-        # Check indexes are in the range
+        # Check index are in the range
         if max(col_filter) >= div.v.shape[0] or max(col_filter) < 0:
-            raise ValueError('indexes in col_filter must be in the range [0, ' + str(div.v.shape[0]) + ']')
+            raise ValueError('index in col_filter must be in the range [0, ' + str(div.v.shape[0]) + ']')
         else:
-            filt_indexes = col_filter
+            filt_index = col_filter
     
     filt_div = copy(div)
-    filt_div.d = np.delete(div.d, filt_indexes, axis=1)
-    filt_div.v = np.delete(div.v, filt_indexes)
+    filt_div.d = np.delete(div.d, filt_index, axis=1)
+    filt_div.v = np.delete(div.v, filt_index)
     filt_div.id = filt_div.id +' deletecol using filter ' + str(col_filter)
     
     return filt_div
@@ -131,7 +129,7 @@ def deleterow(div, row_filter):
     Parameters
     ----------
     row_filter: list of str or int
-        name of the row to select or indexes of row to select
+        name of the row to select or index of row to select
     Returns
     ----------
     filt_div: div instance with only filtered rows
@@ -140,7 +138,7 @@ def deleterow(div, row_filter):
     if not(isinstance(row_filter, list)):
         raise ValueError('row_filter must be a list')
 
-    # Check the type of filter: row names or row indexes
+    # Check the type of filter: row names or row index
     if all([isinstance(filt, str) for filt in row_filter]):
         filter_case = 'str'
     elif all([isinstance(filt, (np.integer, int)) for filt in row_filter]):
@@ -149,23 +147,23 @@ def deleterow(div, row_filter):
         raise ValueError('row_filter argument must contain only str or int, not both.')
     
     if filter_case == 'str':
-        filt_indexes = []
+        filt_index = []
         for filt in row_filter:
             if filt not in div.i:
                 raise ValueError(filt + ' is not in div.i')
             else:
                 index = np.where(div.i == filt)[0].ravel()[0]
-                filt_indexes.append(index)
+                filt_index.append(index)
     elif filter_case == 'index':
-        # Check indexes are in the range
+        # Check index are in the range
         if max(row_filter) >= div.i.shape[0] or max(row_filter) < 0:
-            raise ValueError('indexes in row_filter must be in the range [0, ' + str(div.i.shape[0]) + ']')
+            raise ValueError('index in row_filter must be in the range [0, ' + str(div.i.shape[0]) + ']')
         else:
-            filt_indexes = row_filter
+            filt_index = row_filter
     
     filt_div = copy(div)
-    filt_div.d = np.delete(div.d, filt_indexes, axis=0)
-    filt_div.i = np.delete(div.i, filt_indexes)
+    filt_div.d = np.delete(div.d, filt_index, axis=0)
+    filt_div.i = np.delete(div.i, filt_index)
     filt_div.id = filt_div.id +' deleterow using filter ' + str(row_filter)
     
     return filt_div
@@ -176,7 +174,7 @@ def selectcol(div, col_filter):
     Parameters
     ----------
     col_filter: list of str or int
-        name of the column to select or indexes of column to select
+        name of the column to select or index of column to select
 
     Returns
     ----------
@@ -186,7 +184,7 @@ def selectcol(div, col_filter):
     if not(isinstance(col_filter, list)):
         raise ValueError('col_filter must be a list')
 
-    # Check the type of filter: col names or col indexes
+    # Check the type of filter: col names or col index
     if all([isinstance(filt, str) for filt in col_filter]):
         filter_case = 'str'
     elif all([isinstance(filt, (np.integer, int)) for filt in col_filter]):
@@ -195,23 +193,23 @@ def selectcol(div, col_filter):
         raise ValueError('col_filter argument must contain only str or int, not both.')
     
     if filter_case == 'str':
-        filt_indexes = []
+        filt_index = []
         for filt in col_filter:
             if filt not in div.v:
                 raise ValueError(str(filt) + ' is not in div.v')
             else:
                 index = np.where(div.v == filt)[0].ravel()[0]
-                filt_indexes.append(index)
+                filt_index.append(index)
     elif filter_case == 'index':
-        # Check indexes are in the range
+        # Check index are in the range
         if max(col_filter) >= div.v.shape[0] or max(col_filter) < 0:
-            raise ValueError('indexes in col_filter must be in the range [0, ' + str(div.v.shape[0]) + ']')
+            raise ValueError('index in col_filter must be in the range [0, ' + str(div.v.shape[0]) + ']')
         else:
-            filt_indexes = col_filter
+            filt_index = col_filter
             
     filt_div = copy(div)
-    filt_div.d = div.d[:, filt_indexes]
-    filt_div.v = div.v[filt_indexes]
+    filt_div.d = div.d[:, filt_index]
+    filt_div.v = div.v[filt_index]
     filt_div.id = filt_div.id +' selectcol using filter ' + str(col_filter)
     
     return filt_div
@@ -222,7 +220,7 @@ def selectrow(div, row_filter):
     Parameters
     ----------
     row_filter: list of str or int
-        name of the row to select or indexes of row to select
+        name of the row to select or index of row to select
     Returns
     ----------
     filt_div: div instance with only filtered rows
@@ -231,7 +229,7 @@ def selectrow(div, row_filter):
     if not(isinstance(row_filter, list)):
         raise ValueError('row_filter must be a list')
     
-    # Check the type of filter: row names or row indexes
+    # Check the type of filter: row names or row index
     if all([isinstance(filt, str) for filt in row_filter]):
         filter_case = 'str'
     elif all([isinstance(filt, (np.integer, int)) for filt in row_filter]):
@@ -240,23 +238,23 @@ def selectrow(div, row_filter):
         raise ValueError('row_filter argument must contain only str or int, not both.')
     
     if filter_case == 'str':
-        filt_indexes = []
+        filt_index = []
         for filt in row_filter:
             if filt not in div.i:
                 raise ValueError(str(filt) + ' is not in div.i')
             else:
                 index = np.where(div.i == filt)[0].ravel()[0]
-                filt_indexes.append(index)
+                filt_index.append(index)
     elif filter_case == 'index':
-        # Check indexes are in the range
+        # Check index are in the range
         if max(row_filter) >= div.i.shape[0] or max(row_filter) < 0:
-            raise ValueError('indexes in row_filter must be in the range [0, ' + str(div.i.shape[0]) + ']')
+            raise ValueError('index in row_filter must be in the range [0, ' + str(div.i.shape[0]) + ']')
         else:
-            filt_indexes = row_filter
+            filt_index = row_filter
     
     filt_div = copy(div)
-    filt_div.d = div.d[filt_indexes, :]
-    filt_div.i = div.i[filt_indexes]
+    filt_div.d = div.d[filt_index, :]
+    filt_div.i = div.i[filt_index]
     filt_div.id = filt_div.id +' selectrow using filter ' + str(row_filter)
     
     return filt_div
@@ -424,7 +422,7 @@ def grouping(div, filter):
         filter_val_list = [filter_limit_size] + filter_val_list
 
     index_match_filter = []
-    # Loop on indexes
+    # Loop on index
     for ind, identifier in enumerate(div.i):
         # Loop on filters
         for filt_ind, filt in enumerate(filter_val_list):
@@ -788,18 +786,18 @@ def sum_div(div, field = ''):
     
 def check_duplicate(div):
     """
-    Return list of indexes that are duplicated in your d,i,v fields
+    Return list of index that are duplicated in your d,i,v fields
     Parameters
     ----------
     div: an instance of Div class
     
     Notes
     -----
-    1 - check that every row name is different. If not, send back indexes of row that have identical row names
+    1 - check that every row name is different. If not, send back index of row that have identical row names
 
-    2 - check that every col name is different. If not, send back indexes of col that have identical col names
+    2 - check that every col name is different. If not, send back index of col that have identical col names
 
-    3 - check that every line and every col are different. If not, send back indexes of col/ind that are identical
+    3 - check that every line and every col are different. If not, send back index of col/ind that are identical
 
     
     return
@@ -807,7 +805,7 @@ def check_duplicate(div):
     structure with fields:
     - duplicate_i: dict with row .i as keys and row index of duplicates as val
     - duplicate_v: dict with col .v as keys and col index of duplicates as val
-    - duplicate_d: dict with 2 fields 'row' and 'col', values are lists grouping indexes that are identical row and col of .d field of the div
+    - duplicate_d: dict with 2 fields 'row' and 'col', values are lists grouping index that are identical row and col of .d field of the div
 
     """
 
@@ -1241,3 +1239,116 @@ def distance(div1,div2):
     Distance.id = 'matrices distance'
     
     return Distance
+
+def group_mean(div,group):
+    """
+    Compute the means according to a grouping
+    Parameters
+    ----------
+    div: data to be averaged by group
+    group: integer giving the group number for each row
+    Return
+    ------
+    Class foo with Div      
+        center: div of the averages by group
+        group_size: number of observations belonging to the corresponding group
+
+    """
+    group_index=np.unique(group.d)
+    ngroup=len(group_index)
+    #print(ngroup,div.d.shape[1])
+    xcenter=np.zeros([ngroup,div.d.shape[1]])
+    aux=np.zeros([ngroup,1])
+    k=0
+    for i in group_index:
+        index_group=np.where(group.d == i)[0]
+    #         print(index_group.shape)
+    #        #print(i,div.d[index_group,:].shape[0])
+        aux[k]=np.asarray(div.d[index_group,:].shape)[0]
+        xcenter[k,:]=np.mean(div.d[index_group,:])
+        k=k+1
+    #     print(xcenter)
+    center=Div(d=xcenter,i=np.array(group_index),v=div.v) 
+    group_size=Div(d=aux,i=np.array(group_index),v='group size')
+    Group_mean_type=u.Foo(info='Group_mean',center=center,group_size=group_size) 
+    return Group_mean_type
+    
+def isdiv(obj):
+    """
+    isdiv tests if obj is a div instance
+    Parameters
+    ----------
+    obj: a python objet
+    
+    return
+    -----
+    true if obj has field d, i, v, else otherwise 
+
+    Note
+    ------
+    The function only verifies that fields d, i, v exist in the object. This
+    is sufficient in practice to give confidence that the object is an instance
+    of class Div. This function tries to replace the function isinstance of Python
+    wich is not correctly working in some situation.
+    """
+    return(hasattr(obj, 'd') and hasattr(obj, 'i') and hasattr(obj, 'v'))
+
+def randomize(div):
+     """
+     return div with rows in random order
+     Parameters
+     ----------
+     div: an instance of Div class
+     
+     return
+     ------
+     a div matrix with the order of the rows randomized
+     
+     """
+     if(not(isdiv(div))):
+         raise ValueError('the entered argument is not an instance of class div')
+
+     rorder=np.random.permutation(np.arange(div.i.shape[0]))
+     return(selectrow(div,rorder.tolist()))
+
+def reorder(div1,div2):
+    """
+    This function makes it possible to realign the rows of div1 and div2, in order
+    to have the identifiers corresponding.
+    The function discards the observations which are not present in d1v and div2.
+    Fails if div1 or div2 contains duplicate (identical) identifiers of rows. 
+    The rows in the resulting out Div instances are sorted in the alphabetic order of 
+    the rows identifiers (.i)
+    
+    Parameters
+    ----------
+    div1, div2 instances of class Div to be reordered
+
+    Returns
+    ----------
+    out1, out2 : reordered Div instances corresponding to div1 and div2 respectively
+    diff1, diff2 : list of rows names with no correspondance found in div1 and div2 repsectively 
+    """
+    if(not(isdiv(div1))):
+         raise ValueError('the entered first argument is not an instance of class div')
+    if(not(isdiv(div2))):
+         raise ValueError('the entered second argument is not an instance of class div')
+    if((np.shape(div1.i)[0])!= (np.shape(np.unique(div1.i))[0])):
+        raise ValueError('the first argument has not unique row identifiers. Impossible to reororder')
+    if((np.shape(div2.i)[0])!= (np.shape(np.unique(div2.i))[0])):
+        raise ValueError('the second argument has not unique row identifiers. Impossible to reororder')
+    common=np.intersect1d(div1.i,div2.i)
+    list1=list()
+    list2=list()
+    for index, thisname in enumerate(common):
+        row_index1 = np.where(div1.i == thisname)[0]#.ravel().tolist()
+        list1.append(row_index1[0])
+        row_index2 = np.where(div2.i == thisname)[0]#.ravel().tolist()
+        list2.append(row_index2[0])
+    out1=selectrow(div1,list1)
+    out2=selectrow(div2,list2)
+
+    diff1=list(set(div1.i).difference(set(common))) 
+    diff2=list(set(div2.i).difference(set(common))) 
+    
+    return(out1,out2,diff1,diff2)
